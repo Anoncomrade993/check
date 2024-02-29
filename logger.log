@@ -1,0 +1,209 @@
+   Compiling image-steganography v0.0.1 (/home/runner/check)
+error: expected `;`, found keyword `use`
+ --> src/utils/tool.rs:7:18
+  |
+7 | use std::fs::File
+  |                  ^ help: add `;` here
+8 | use std::io::Error;
+  | --- unexpected token
+
+error[E0432]: unresolved import `pixelate::algorithms::lsb::LSB`
+ --> src/utils/tool.rs:2:32
+  |
+2 | use pixelate::algorithms::lsb::LSB::{encode,decode};
+  |                                ^^^ `LSB` is a struct, not a module
+
+error[E0432]: unresolved import `base64::BASE_STANDARD`
+ --> src/utils/tool.rs:4:5
+  |
+4 | use base64::BASE_STANDARD;
+  |     ^^^^^^^^^^^^^^^^^^^^^ no `BASE_STANDARD` in the root
+
+error[E0432]: unresolved imports `serde_json::Deserialize`, `serde_json::Serialize`
+ --> src/utils/tool.rs:5:18
+  |
+5 | use serde_json::{Deserialize, Serialize,Value};
+  |                  ^^^^^^^^^^^  ^^^^^^^^^ no `Serialize` in the root
+  |                  |
+  |                  no `Deserialize` in the root
+  |
+help: a similar name exists in the module
+  |
+5 | use serde_json::{Deserializer, Serialize,Value};
+  |                  ~~~~~~~~~~~~
+help: a similar name exists in the module
+  |
+5 | use serde_json::{Deserialize, Serializer,Value};
+  |                               ~~~~~~~~~~
+
+warning: unused import: `Read`
+ --> src/utils/tool.rs:6:15
+  |
+6 | use std::io::{Read,BufReader};
+  |               ^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unnecessary trailing semicolon
+  --> src/utils/tool.rs:76:49
+   |
+76 |    let b_msg = data_encode(message.as_string());;
+   |                                                 ^ help: remove this semicolon
+   |
+   = note: `#[warn(redundant_semicolons)]` on by default
+
+error[E0599]: no method named `as_string` found for reference `&str` in the current scope
+  --> src/utils/tool.rs:19:24
+   |
+19 |       channel: channel.as_string(),
+   |                        ^^^^^^^^^ help: there is a method with a similar name: `as_ptr`
+
+error[E0599]: no method named `as_string` found for reference `&str` in the current scope
+  --> src/utils/tool.rs:21:24
+   |
+21 |       message: message.as_string(),
+   |                        ^^^^^^^^^ help: there is a method with a similar name: `as_ptr`
+
+error[E0277]: `?` couldn't convert the error to `std::io::Error`
+  --> src/utils/tool.rs:29:31
+   |
+28 | fn read_image(path:&str) -> Result<Vec<u8>,Error>{
+   |                             --------------------- expected `std::io::Error` because of this
+29 |   let _img = image::open(path)?;
+   |                               ^ the trait `From<ImageError>` is not implemented for `std::io::Error`
+   |
+   = note: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait
+   = help: the following other types implement trait `From<T>`:
+             <std::io::Error as From<serde_json::Error>>
+             <std::io::Error as From<flate2::mem::DecompressError>>
+             <std::io::Error as From<flate2::mem::CompressError>>
+             <std::io::Error as From<png::decoder::stream::DecodingError>>
+             <std::io::Error as From<png::encoder::EncodingError>>
+             <std::io::Error as From<NulError>>
+             <std::io::Error as From<IntoInnerError<W>>>
+             <std::io::Error as From<ErrorKind>>
+   = note: required for `Result<Vec<u8>, std::io::Error>` to implement `FromResidual<Result<Infallible, ImageError>>`
+
+error[E0308]: mismatched types
+  --> src/utils/tool.rs:30:6
+   |
+28 | fn read_image(path:&str) -> Result<Vec<u8>,Error>{
+   |                             --------------------- expected `Result<Vec<u8>, std::io::Error>` because of return type
+29 |   let _img = image::open(path)?;
+30 |      _img.pixels()
+   |      ^^^^^^^^^^^^^ expected `Result<Vec<u8>, Error>`, found `Pixels<'_, DynamicImage>`
+   |
+   = note: expected enum `Result<Vec<u8>, std::io::Error>`
+            found struct `image::Pixels<'_, DynamicImage>`
+
+error[E0277]: the `?` operator can only be applied to values that implement `Try`
+  --> src/utils/tool.rs:36:20
+   |
+36 |   let mut buffer = BufReader::new(file)?;
+   |                    ^^^^^^^^^^^^^^^^^^^^^ the `?` operator cannot be applied to type `BufReader<File>`
+   |
+   = help: the trait `Try` is not implemented for `BufReader<File>`
+
+error[E0308]: mismatched types
+  --> src/utils/tool.rs:38:21
+   |
+38 |   let val : Value = serde_json::from_str(&buffer);
+   |             -----   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Value`, found `Result<_, Error>`
+   |             |
+   |             expected due to this
+   |
+   = note: expected enum `Value`
+              found enum `Result<_, serde_json::Error>`
+help: use the `?` operator to extract the `Result<_, serde_json::Error>` value, propagating a `Result::Err` value to the caller
+   |
+38 |   let val : Value = serde_json::from_str(&buffer)?;
+   |                                                  +
+
+error[E0308]: mismatched types
+  --> src/utils/tool.rs:65:20
+   |
+65 |   let bin = binary(strng);
+   |             ------ ^^^^^- help: try using a conversion method: `.to_string()`
+   |             |      |
+   |             |      expected `String`, found `&str`
+   |             arguments to this function are incorrect
+   |
+note: function defined here
+  --> src/utils/tool.rs:48:5
+   |
+48 |  fn binary(text: String) -> String {
+   |     ^^^^^^ ------------
+
+error[E0308]: mismatched types
+  --> src/utils/tool.rs:66:26
+   |
+66 |   let base = base_encode(bin.as_bytes());
+   |              ----------- ^^^^^^^^^^^^^^ expected `&str`, found `&[u8]`
+   |              |
+   |              arguments to this function are incorrect
+   |
+   = note: expected reference `&str`
+              found reference `&[u8]`
+note: function defined here
+  --> src/utils/tool.rs:41:4
+   |
+41 | fn base_encode(data:&str){
+   |    ^^^^^^^^^^^ ---------
+
+error[E0599]: no method named `as_str` found for unit type `()` in the current scope
+  --> src/utils/tool.rs:67:10
+   |
+67 |     base.as_str()
+   |          ^^^^^^ method not found in `()`
+
+error[E0599]: no method named `ok_or` found for enum `Result` in the current scope
+  --> src/utils/tool.rs:70:28
+   |
+70 |   let jf = read_json(path).ok_or("error reading file")?;
+   |                            ^^^^^ method not found in `Result<Value, Error>`
+
+error[E0308]: mismatched types
+  --> src/utils/tool.rs:79:31
+   |
+79 |    let d = Data::new(&channel,&pixels,&b_msg);
+   |            ---------          ^^^^^^^ expected `Vec<u8>`, found `&Result<Vec<u8>, Error>`
+   |            |
+   |            arguments to this function are incorrect
+   |
+   = note: expected struct `Vec<u8>`
+           found reference `&Result<Vec<u8>, std::io::Error>`
+note: associated function defined here
+  --> src/utils/tool.rs:17:6
+   |
+17 |   fn new(channel:&str,pixels:Vec<u8>, message:&str)-> Self{
+   |      ^^^              --------------
+
+error[E0277]: `tool::Data` doesn't implement `std::fmt::Display`
+  --> src/utils/tool.rs:80:20
+   |
+80 |    println!(" {:}",d);
+   |                    ^ `tool::Data` cannot be formatted with the default formatter
+   |
+   = help: the trait `std::fmt::Display` is not implemented for `tool::Data`
+   = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+   = note: this error originates in the macro `$crate::format_args_nl` which comes from the expansion of the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0308]: `match` arms have incompatible types
+  --> src/main.rs:9:15
+   |
+7  | /   match stdin().read_line(&mut box_) {
+8  | |     Ok(_) => handler(&box_).ok(),
+   | |              ------------------- this is found to be of type `Option<Vec<u8>>`
+9  | |     Err(e) => println!("Error taking input")
+   | |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Option<Vec<u8>>`, found `()`
+10 | |   }
+   | |___- `match` arms have incompatible types
+   |
+   = note:   expected enum `Option<Vec<u8>>`
+           found unit type `()`
+   = note: this error originates in the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+Some errors have detailed explanations: E0277, E0308, E0432, E0599.
+For more information about an error, try `rustc --explain E0277`.
+warning: `image-steganography` (bin "image-steganography") generated 2 warnings
+error: could not compile `image-steganography` (bin "image-steganography") due to 17 previous errors; 2 warnings emitted

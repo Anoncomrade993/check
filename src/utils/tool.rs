@@ -1,7 +1,7 @@
 
 use pixelate::algorithms::lsb::LSB::{encode,decode};
 use image::GenericImageView;
-use base64::prelude::*;
+use base64::BASE_STANDARD;
 use serde_json::{Deserialize, Serialize,Value};
 use std::io::{Read,BufReader};
 use std::fs::File
@@ -67,17 +67,17 @@ fn data_encode(strng:&str) -> String {
     base.as_str()
 }
 pub fn handler(path : &str) -> Result<Vec<u8>,&'static str>{
-  let jf = read_json(path).ok()?;
+  let jf = read_json(path).ok_or("error reading file")?;
    
    let message = &jf["message"];
    
    let f_path= &jf["path"];
    
-   let b_msg = base_encode(message);
+   let b_msg = data_encode(message.as_string());;
    let mut channel = &jf["channel"];
    let mut pixels = read_image(f_path);
    let d = Data::new(&channel,&pixels,&b_msg);
-   println("{:?}",d);
+   println!(" {:}",d);
   let lsb_enc =  encode(&mut pixels,b_msg,&mut channel);
        lsb_enc
 }
