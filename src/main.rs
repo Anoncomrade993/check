@@ -1,11 +1,16 @@
 mod utils;
-use utils::tool::{ handler };
+use utils::tool::handler;
 use std::io::stdin;
 
 fn main() {
   let mut box_ = String::new();
   match stdin().read_line(&mut box_) {
-    Ok(_) => handler(&box_).ok(),
-    Err(e) => println!("Error taking input")
+    Ok(b) => {
+      handler(&box_).unwrap();
+    },
+    Err(_)=>{
+      println!("Error taking input")
+    
+    }
   }
 }

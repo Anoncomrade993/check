@@ -1,10 +1,10 @@
 
-use pixelate::algorithms::lsb::LSB::{encode,decode};
-use image::GenericImageView;
-use base64::BASE_STANDARD;
-use serde_json::{Deserialize, Serialize,Value};
-use std::io::{Read,BufReader};
-use std::fs::File
+use pixelate::algorithms::lsb::LSB;
+use image::{GenericImageView,Pixel};
+use base64::Engine;
+use serde_json::Value;
+use std::io::BufReader;
+use std::fs::File;
 use std::io::Error;
 
 #[derive(Debug)]
@@ -16,33 +16,37 @@ struct Data{
 impl Data{
   fn new(channel:&str,pixels:Vec<u8>, message:&str)-> Self{
     Self{
-      channel: channel.as_string(),
+      channel: channel.to_string(),
       pixels,
-      message: message.as_string(),
+      message: message.to_string(),
     }
   }
 }
 
 
 
-fn read_image(path:&str) -> Result<Vec<u8>,Error>{
-  let _img = image::open(path)?;
-     _img.pixels()
+fn read_image(path:&str) -> Result<Vec<u8>,image::flat::Error>{
+  let _img = image::open(path).unwrap();
+     let pixel_data: Vec<u8> = _img.pixels().flat_map(|(_, _, pixel)| {
+        let rgba = pixel.to_rgba();
+        vec![rgba[0], rgba[1], rgba[2], rgba[3]]
+    }).collect();
+  Ok(pixel_data)
 }
 
 fn read_json(path:&str) -> Result<Value,Error>{
   let file = File::open(path)?;
   let store = String::new();
-  let mut buffer = BufReader::new(file)?;
-  buffer.read_as_string(&mut store);
-  let val : Value = serde_json::from_str(&buffer);
+  let mut buffer = BufReader::new(file);
+  buffer(&mut store);
+  let val : Data = serde_json::from_str(&buffer);
   Ok(val)
 }
 fn base_encode(data:&str){
    BASE_STANDARD.encode(data.as_bytes());
 }
 fn base_decode(data:&str){
-   BASE_STANDARD.decode(data.as_bytes());
+   Engine::decode(data.to_string())
 }
 /// Approach to convert a string to binary
  fn binary(text: String) -> String {
@@ -62,12 +66,12 @@ fn base_decode(data:&str){
         .collect()
 }
 fn data_encode(strng:&str) -> String {
-  let bin = binary(strng);
-  let base = base_encode(bin.as_bytes());
-    base.as_str()
+  let bin = binary(strng.to_string);
+  let base = base_encode(&bin);
+    String::from_utf8(base).unwrap()
 }
 pub fn handler(path : &str) -> Result<Vec<u8>,&'static str>{
-  let jf = read_json(path).ok_or("error reading file")?;
+  let jf = read_json(path).expect("error");
    
    let message = &jf["message"];
    
@@ -75,9 +79,9 @@ pub fn handler(path : &str) -> Result<Vec<u8>,&'static str>{
    
    let b_msg = data_encode(message.as_string());;
    let mut channel = &jf["channel"];
-   let mut pixels = read_image(f_path);
+   let mut pixels = read_image(f_path).ok(b"error");
    let d = Data::new(&channel,&pixels,&b_msg);
-   println!(" {:}",d);
-  let lsb_enc =  encode(&mut pixels,b_msg,&mut channel);
+   println!(" {:?}",d);
+  let lsb_enc =  LSB::encode(&mut pixels,b_msg,&mut channel);
        lsb_enc
 }
