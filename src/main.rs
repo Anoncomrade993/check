@@ -1,16 +1,14 @@
 mod utils;
-use utils::tool::handler;
-use std::io::stdin;
-
+use utils::quake::handler;
+#[warn(dead_code)]
 fn main() {
-  let mut box_ = String::new();
-  match stdin().read_line(&mut box_) {
-    Ok(b) => {
-      handler(&box_).unwrap();
-    },
-    Err(_)=>{
-      println!("Error taking input")
-    
+  match handler(){
+    Ok(lsb)=>{
+      println!("{:#?}",lsb)
     }
+    Err(e)=>{
+      println!("{}",e)
   }
+  }
+  
 }
