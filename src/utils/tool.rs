@@ -34,12 +34,12 @@ fn read_image(path:&str) -> Result<Vec<u8>,image::flat::Error>{
   Ok(pixel_data)
 }
 
-fn read_json(path:&str) -> Result<Value,Error>{
+fn read_json(path:&str) -> Result<Data,Error>{
   let file = File::open(path)?;
   let store = String::new();
   let mut buffer = BufReader::new(file);
-  buffer(&mut store);
-  let val : Data = serde_json::from_str(&buffer);
+  buffer.read_line(&mut store);
+  let val :Data = serde_json::from_str(&buffer);
   Ok(val)
 }
 fn base_encode(data:&str){
@@ -77,11 +77,11 @@ pub fn handler(path : &str) -> Result<Vec<u8>,&'static str>{
    
    let f_path= &jf["path"];
    
-   let b_msg = data_encode(message.as_string());;
+   let b_msg = data_encode(message.to_string());
    let mut channel = &jf["channel"];
    let mut pixels = read_image(f_path).ok(b"error");
    let d = Data::new(&channel,&pixels,&b_msg);
    println!(" {:?}",d);
-  let lsb_enc =  LSB::encode(&mut pixels,b_msg,&mut channel);
+  let lsb_enc =  LSB::encode(&mut pixels,&b_msg,&mut channel);
        lsb_enc
 }
